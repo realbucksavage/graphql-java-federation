@@ -85,7 +85,7 @@ public final class FederatedSchemaBuilder {
         }
 
         final TypeDefinitionRegistry typeDefinitionRegistry = new SchemaParser().parse(sdl);
-        final SchemaGenerator.Options options = SchemaGenerator.Options.defaultOptions().enforceSchemaDirectives(false);
+        final SchemaGenerator.Options options = SchemaGenerator.Options.defaultOptions();
         return new SchemaGenerator().makeExecutableSchema(
                 options,
                 typeDefinitionRegistry,
@@ -149,7 +149,7 @@ public final class FederatedSchemaBuilder {
                 .findFirst()
                 .orElseThrow(() -> new FederationException("Can't find @key directive"));
 
-        final String idFieldName = keyDirective.getArguments().get(0).getValue().toString();
+        final String idFieldName = keyDirective.getArguments().get(0).getArgumentValue().toString();
 
         final String idValue = (String) representation.get(idFieldName);
 
@@ -177,9 +177,8 @@ public final class FederatedSchemaBuilder {
     private String getSchema() {
         final SchemaPrinter.Options options = SchemaPrinter.Options.defaultOptions()
                 .includeScalarTypes(true)
-                .includeExtendedScalarTypes(true)
                 .includeSchemaDefinition(true)
-                .includeDirectives(d -> !apolloServerExistedDirectives.contains(d.getName()));
+                .includeDirectives(d -> !apolloServerExistedDirectives.contains(d));
         String schema = new SchemaPrinter(options).print(originalSchema);
         if (this.excludeSubscriptionsFromApolloSdl) {
             schema = removeSubscriptionDefinitionIfExists(schema);
