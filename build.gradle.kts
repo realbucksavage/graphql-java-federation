@@ -7,10 +7,8 @@ version = "0.1.16"
 
 plugins {
     `java-library`
-    `maven-publish`
     idea
     id("com.google.protobuf")
-    id("com.jfrog.bintray")
 }
 
 val graphqlJavaVersion: String by project
@@ -60,53 +58,6 @@ val sourcesJar by tasks.registering(Jar::class) {
 }
 
 val projectUrl = "https://github.com/rkudryashov/graphql-java-federation.git"
-
-publishing {
-    publications {
-        create<MavenPublication>("lib") {
-            groupId = project.group.toString()
-            artifactId = project.name
-            // todo setup plugin
-            version = project.version.toString()
-            from(components["java"])
-            artifact(sourcesJar.get())
-
-            pom.withXml {
-                asNode().apply {
-                    appendNode(
-                        "description",
-                        "The library provides an ability to graphql-java service to work as Apollo Server downstream service implementing Apollo Federation spec"
-                    )
-                    appendNode("name", rootProject.name)
-                    appendNode("licenses").appendNode("license").apply {
-                        appendNode("name", "MIT")
-                    }
-                    appendNode("scm").apply {
-                        appendNode("url", projectUrl)
-                    }
-                }
-            }
-        }
-    }
-}
-
-bintray {
-    user = System.getenv("BINTRAY_USER")
-    key = System.getenv("BINTRAY_KEY")
-    publish = true
-    setPublications("lib")
-    pkg.apply {
-        userOrg = "gqljf"
-        repo = "maven"
-        name = "graphql-java-federation"
-        setLicenses("MIT")
-        vcsUrl = projectUrl
-        githubRepo = githubRepo
-        version.apply {
-            name = project.version.toString()
-        }
-    }
-}
 
 idea {
     module {
